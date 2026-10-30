@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 
 interface Employee {
@@ -55,7 +56,8 @@ interface Payroll {
   status: string;
 }
 
-const API_URL = "http://localhost:8081/api";
+// Backend URL from Vercel environment variables
+const API_URL = `${import.meta.env.VITE_API_URL}/api`;
 
 function Dashboard() {
   const role = localStorage.getItem("role") || "";

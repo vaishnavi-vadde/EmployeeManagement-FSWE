@@ -33,7 +33,8 @@ interface LoginResponse {
   message?: string;
 }
 
-const API_URL = "http://localhost:8081/api";
+// Backend URL from Vercel environment variables
+const API_URL = `${import.meta.env.VITE_API_URL}/api`;
 
 function normalizeRole(value?: string): string {
   return (value || "")
@@ -120,6 +121,7 @@ function Login({ onLogin }: LoginProps) {
           "activeLoginRecordId",
           String(activeRecord.id)
         );
+
         return;
       }
 
@@ -156,7 +158,9 @@ function Login({ onLogin }: LoginProps) {
           String(savedRecord.id)
         );
       } else {
-        throw new Error("The server did not return a login record ID.");
+        throw new Error(
+          "The server did not return a login record ID."
+        );
       }
     } catch (err) {
       // An attendance-record failure should not block a valid login.
@@ -196,7 +200,9 @@ function Login({ onLogin }: LoginProps) {
       try {
         loginData = await response.json();
       } catch {
-        throw new Error("The server returned an invalid login response.");
+        throw new Error(
+          "The server returned an invalid login response."
+        );
       }
 
       if (!response.ok) {
@@ -392,8 +398,12 @@ function Login({ onLogin }: LoginProps) {
         <div className="login-demo">
           <strong>Login Instructions</strong>
           <span>HR: Use your registered HR email and password.</span>
-          <span>Manager: Use your registered Manager email and password.</span>
-          <span>Employee: Use your registered Employee email and password.</span>
+          <span>
+            Manager: Use your registered Manager email and password.
+          </span>
+          <span>
+            Employee: Use your registered Employee email and password.
+          </span>
         </div>
       </div>
     </div>

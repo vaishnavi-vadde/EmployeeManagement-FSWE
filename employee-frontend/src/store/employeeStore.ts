@@ -2,7 +2,7 @@
 import { create } from "zustand";
 import type { Employee } from "../employee";
 
-const API_URL = "http://localhost:8081/api/employees";
+const API_URL = `${import.meta.env.VITE_API_URL}/api/employees`;
 
 interface EmployeeStore {
   employees: Employee[];

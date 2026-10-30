@@ -25,8 +25,8 @@ interface AttendanceProps {
   role: string;
 }
 
-const API_URL = "http://localhost:8081/api/login-records";
-const EMPLOYEE_API = "http://localhost:8081/api/employees";
+const API_URL = `${import.meta.env.VITE_API_URL}/api/login-records`;
+const EMPLOYEE_API = `${import.meta.env.VITE_API_URL}/api/employees`;
 
 // Add the JWT token to every protected API request.
 async function authenticatedFetch(
@@ -86,6 +86,7 @@ function LoginRecords({ role }: AttendanceProps) {
 
     const data: Employee[] = await response.json();
     setEmployees(data);
+
     return data;
   };
 
@@ -101,6 +102,7 @@ function LoginRecords({ role }: AttendanceProps) {
 
     const data: LoginRecord[] = await response.json();
     setRecords(data);
+
     return data;
   };
 
@@ -212,6 +214,7 @@ function LoginRecords({ role }: AttendanceProps) {
       setMessage("Login record added successfully.");
     } catch (err) {
       console.error("Add login record error:", err);
+
       setError(
         err instanceof Error
           ? err.message
@@ -255,6 +258,7 @@ function LoginRecords({ role }: AttendanceProps) {
       setMessage("Attendance status updated successfully.");
     } catch (err) {
       console.error("Update status error:", err);
+
       setError(
         err instanceof Error
           ? err.message
@@ -295,6 +299,7 @@ function LoginRecords({ role }: AttendanceProps) {
       setMessage("Login record deleted successfully.");
     } catch (err) {
       console.error("Delete record error:", err);
+
       setError(
         err instanceof Error
           ? err.message
@@ -361,6 +366,7 @@ function LoginRecords({ role }: AttendanceProps) {
       <div className="section-card">
         <div className="section-title">
           <span>🔐</span>
+
           <div>
             <h2>
               {isHR
@@ -411,8 +417,10 @@ function LoginRecords({ role }: AttendanceProps) {
         <div className="section-card">
           <div className="section-title">
             <span>🔑</span>
+
             <div>
               <h2>Record Employee Login</h2>
+
               <p>
                 {isHR
                   ? "Add a login record for an employee"
@@ -446,7 +454,9 @@ function LoginRecords({ role }: AttendanceProps) {
               onChange={(e) => setStatus(e.target.value)}
             >
               <option value="LOGGED IN">Logged In</option>
-              <option value="NOT LOGGED IN">Not Logged In</option>
+              <option value="NOT LOGGED IN">
+                Not Logged In
+              </option>
             </select>
 
             <button type="submit" className="add-btn">
@@ -460,6 +470,7 @@ function LoginRecords({ role }: AttendanceProps) {
       <div className="section-card">
         <div className="section-title">
           <span>📋</span>
+
           <div>
             <h2>
               {isHR
@@ -565,6 +576,7 @@ function LoginRecords({ role }: AttendanceProps) {
                           <option value="LOGGED IN">
                             Logged In
                           </option>
+
                           <option value="NOT LOGGED IN">
                             Not Logged In
                           </option>

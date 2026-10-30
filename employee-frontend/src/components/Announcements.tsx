@@ -10,7 +10,8 @@ interface Announcement {
   date: string;
 }
 
-const API_URL = "http://localhost:8081/api/announcements";
+// Backend URL from Vercel environment variables
+const API_URL = `${import.meta.env.VITE_API_URL}/api/announcements`;
 
 function Announcements() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -93,7 +94,7 @@ function Announcements() {
     }
 
     let department = "ALL";
-    let createdBy = username || "HR";
+    const createdBy = username || "HR";
 
     if (role === "manager") {
       if (!employeeDepartment.trim()) {

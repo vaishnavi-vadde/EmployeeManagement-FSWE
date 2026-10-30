@@ -17,6 +17,9 @@ interface Department {
   employees: number;
 }
 
+// Backend URL from Vercel environment variables
+const API_URL = `${import.meta.env.VITE_API_URL}/api/employees`;
+
 function Departments() {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,15 +43,12 @@ function Departments() {
       }
 
       // Fetch employees with JWT authentication.
-      const response = await fetch(
-        "http://localhost:8081/api/employees",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(API_URL, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (!response.ok) {
         const details = await response.text();

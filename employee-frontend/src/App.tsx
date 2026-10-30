@@ -18,6 +18,9 @@ import MedicalInsurance from "./components/MedicalInsurance";
 import type { Employee } from "./employee";
 import "./App.css";
 
+// Backend URL from Vercel environment variables
+const API_URL = import.meta.env.VITE_API_URL;
+
 function App() {
   // LOGIN STATE
   const [loggedIn, setLoggedIn] = useState(
@@ -55,7 +58,7 @@ function App() {
     if (token && recordId) {
       try {
         const response = await fetch(
-          `http://localhost:8081/api/login-records/${encodeURIComponent(
+          `${API_URL}/api/login-records/${encodeURIComponent(
             recordId
           )}/logout`,
           {

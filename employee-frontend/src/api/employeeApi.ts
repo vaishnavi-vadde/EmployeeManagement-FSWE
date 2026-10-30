@@ -1,6 +1,8 @@
+
 import type { Employee } from "../employee";
 
-const API_URL = "http://localhost:8081/api/employees";
+// Backend URL from Vercel environment variables
+const API_URL = `${import.meta.env.VITE_API_URL}/api/employees`;
 
 export const getEmployees = async (): Promise<Employee[]> => {
   const response = await fetch(API_URL);

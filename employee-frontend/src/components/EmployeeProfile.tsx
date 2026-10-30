@@ -14,6 +14,9 @@ interface Employee {
   role?: string;
 }
 
+// Backend URL from Vercel environment variables
+const API_URL = `${import.meta.env.VITE_API_URL}/api/employees`;
+
 function EmployeeProfile({ username }: EmployeeProfileProps) {
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [loading, setLoading] = useState(true);
@@ -65,15 +68,12 @@ function EmployeeProfile({ username }: EmployeeProfileProps) {
           );
         }
 
-        const response = await fetch(
-          "http://localhost:8081/api/employees",
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch(API_URL, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (response.status === 401 || response.status === 403) {
           throw new Error(
@@ -116,18 +116,22 @@ function EmployeeProfile({ username }: EmployeeProfileProps) {
 
         // Save the matched employee details for other pages.
         localStorage.setItem("username", matchedEmployee.name);
+
         localStorage.setItem(
           "employeeId",
           `EMP${String(matchedEmployee.id).padStart(3, "0")}`
         );
+
         localStorage.setItem(
           "employeeEmail",
           matchedEmployee.email
         );
+
         localStorage.setItem(
           "employeeDepartment",
           matchedEmployee.department
         );
+
         localStorage.setItem(
           "role",
           matchedEmployee.role?.toLowerCase() || role
@@ -175,6 +179,7 @@ function EmployeeProfile({ username }: EmployeeProfileProps) {
         <div className="section-card">
           <div className="section-title">
             <span>👤</span>
+
             <div>
               <h2>My Profile</h2>
               <p>Your HR / Admin account information</p>
@@ -219,6 +224,7 @@ function EmployeeProfile({ username }: EmployeeProfileProps) {
         <div className="section-card">
           <div className="section-title">
             <span>💼</span>
+
             <div>
               <h2>Job Information</h2>
               <p>Your administrator account details</p>
@@ -288,6 +294,7 @@ function EmployeeProfile({ username }: EmployeeProfileProps) {
       <div className="section-card">
         <div className="section-title">
           <span>👤</span>
+
           <div>
             <h2>My Profile</h2>
             <p>View your employee information</p>
@@ -343,6 +350,7 @@ function EmployeeProfile({ username }: EmployeeProfileProps) {
       <div className="section-card">
         <div className="section-title">
           <span>💼</span>
+
           <div>
             <h2>Job Information</h2>
             <p>Your current employment details</p>

@@ -15,7 +15,7 @@ interface PayrollRecord {
   status: string;
 }
 
-const API_URL = "http://localhost:8081/api/payroll";
+const API_URL = `${import.meta.env.VITE_API_URL}/api/payroll`;
 
 function Payroll() {
   const [records, setRecords] = useState<PayrollRecord[]>([]);

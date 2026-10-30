@@ -11,7 +11,8 @@ interface LeaveRequestData {
   status: string;
 }
 
-const API_URL = "http://localhost:8081/api/leaves";
+// Backend URL from Vercel environment variables
+const API_URL = `${import.meta.env.VITE_API_URL}/api/leaves`;
 
 function LeaveManagement() {
   const [requests, setRequests] = useState<LeaveRequestData[]>([]);
@@ -136,6 +137,7 @@ function LeaveManagement() {
       <div className="section-card">
         <div className="section-title">
           <span>📋</span>
+
           <div>
             <h2>Leave Management</h2>
             <p>Review and manage all employee leave requests</p>
@@ -145,6 +147,7 @@ function LeaveManagement() {
         <div className="leave-stats-grid">
           <div className="leave-stat-card">
             <span>📄</span>
+
             <div>
               <p>Total Requests</p>
               <h2>{totalRequests}</h2>
@@ -153,6 +156,7 @@ function LeaveManagement() {
 
           <div className="leave-stat-card">
             <span>⏳</span>
+
             <div>
               <p>Pending</p>
               <h2>{pendingRequests}</h2>
@@ -161,6 +165,7 @@ function LeaveManagement() {
 
           <div className="leave-stat-card">
             <span>✓</span>
+
             <div>
               <p>Approved</p>
               <h2>{approvedRequests}</h2>
@@ -194,6 +199,7 @@ function LeaveManagement() {
       <div className="section-card">
         <div className="section-title">
           <span>📋</span>
+
           <div>
             <h2>Employee Leave Requests</h2>
             <p>Approve or reject employee leave applications</p>

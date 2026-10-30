@@ -13,7 +13,7 @@ interface InsuranceRecord {
   documentName?: string;
 }
 
-const API_URL = "http://localhost:8081/api/insurance";
+const API_URL = `${import.meta.env.VITE_API_URL}/api/insurance`;
 
 function MedicalInsurance() {
   const role = (localStorage.getItem("role") || "").toLowerCase();
