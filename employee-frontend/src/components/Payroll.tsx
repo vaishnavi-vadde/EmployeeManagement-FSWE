@@ -5,6 +5,7 @@ interface PayrollRecord {
   id: number;
   employeeName: string;
   employeeId: string;
+  employeeEmail: string;
   department: string;
   basicSalary: number;
   allowances: number;
@@ -18,14 +19,18 @@ const API_URL = "http://localhost:8081/api/payroll";
 
 function Payroll() {
   const [records, setRecords] = useState<PayrollRecord[]>([]);
+
   const [employeeName, setEmployeeName] = useState("");
   const [employeeId, setEmployeeId] = useState("");
+  const [employeeEmail, setEmployeeEmail] = useState("");
   const [department, setDepartment] = useState("");
   const [basicSalary, setBasicSalary] = useState("");
   const [allowances, setAllowances] = useState("");
   const [deductions, setDeductions] = useState("");
+
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
@@ -58,6 +63,7 @@ function Payroll() {
 
       if (!response.ok) {
         const details = await response.text();
+
         throw new Error(
           `Failed to fetch payroll (${response.status})` +
             (details ? `: ${details}` : "")
@@ -65,9 +71,11 @@ function Payroll() {
       }
 
       const data: PayrollRecord[] = await response.json();
+
       setRecords(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Payroll loading error:", err);
+
       setError(
         err instanceof Error
           ? err.message
@@ -83,14 +91,18 @@ function Payroll() {
   }, []);
 
   // ADD PAYROLL.
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
+
     setMessage("");
     setError("");
 
     if (
       !employeeName.trim() ||
       !employeeId.trim() ||
+      !employeeEmail.trim() ||
       !department.trim() ||
       !basicSalary.trim()
     ) {
@@ -122,6 +134,7 @@ function Payroll() {
     const newPayroll = {
       employeeName: employeeName.trim(),
       employeeId: employeeId.trim(),
+      employeeEmail: employeeEmail.trim(),
       department: department.trim(),
       basicSalary: basic,
       allowances: allowance,
@@ -145,6 +158,7 @@ function Payroll() {
 
       if (!response.ok) {
         const details = await response.text();
+
         throw new Error(
           `Failed to add payroll (${response.status})` +
             (details ? `: ${details}` : "")
@@ -154,15 +168,19 @@ function Payroll() {
       const savedRecord: PayrollRecord = await response.json();
 
       setRecords((previous) => [...previous, savedRecord]);
+
       setEmployeeName("");
       setEmployeeId("");
+      setEmployeeEmail("");
       setDepartment("");
       setBasicSalary("");
       setAllowances("");
       setDeductions("");
+
       setMessage("Payroll record added successfully.");
     } catch (err) {
       console.error("Add payroll error:", err);
+
       setError(
         err instanceof Error
           ? err.message
@@ -187,6 +205,7 @@ function Payroll() {
 
       if (!response.ok) {
         const details = await response.text();
+
         throw new Error(
           `Failed to update payroll (${response.status})` +
             (details ? `: ${details}` : "")
@@ -195,15 +214,23 @@ function Payroll() {
 
       const updatedRecord: PayrollRecord = await response.json();
 
+      // Update the frontend table immediately.
       setRecords((previous) =>
         previous.map((record) =>
           record.id === id ? updatedRecord : record
         )
       );
 
-      setMessage("Payroll marked as paid.");
+      setMessage(
+        `Salary of ₹${Number(
+          updatedRecord.netSalary
+        ).toLocaleString("en-IN")} marked as paid for ${
+          updatedRecord.employeeName
+        }.`
+      );
     } catch (err) {
       console.error("Update payroll error:", err);
+
       setError(
         err instanceof Error
           ? err.message
@@ -234,6 +261,7 @@ function Payroll() {
 
       if (!response.ok) {
         const details = await response.text();
+
         throw new Error(
           `Failed to delete payroll (${response.status})` +
             (details ? `: ${details}` : "")
@@ -247,6 +275,7 @@ function Payroll() {
       setMessage("Payroll record deleted.");
     } catch (err) {
       console.error("Delete payroll error:", err);
+
       setError(
         err instanceof Error
           ? err.message
@@ -257,12 +286,18 @@ function Payroll() {
     }
   };
 
+  // FORMAT SALARY AS INDIAN RUPEES.
+  const formatSalary = (amount: number | null | undefined) => {
+    return `₹${Number(amount || 0).toLocaleString("en-IN")}`;
+  };
+
   return (
     <div>
       {/* PAYROLL MANAGEMENT FORM */}
       <div className="section-card">
         <div className="section-title">
           <span>💰</span>
+
           <div>
             <h2>Payroll Management</h2>
             <p>Manage employee salary and payroll information</p>
@@ -295,6 +330,14 @@ function Payroll() {
             placeholder="Employee ID"
             value={employeeId}
             onChange={(e) => setEmployeeId(e.target.value)}
+            required
+          />
+
+          <input
+            type="email"
+            placeholder="Employee Email"
+            value={employeeEmail}
+            onChange={(e) => setEmployeeEmail(e.target.value)}
             required
           />
 
@@ -345,6 +388,7 @@ function Payroll() {
       <div className="section-card">
         <div className="section-title">
           <span>📊</span>
+
           <div>
             <h2>Employee Payroll</h2>
             <p>View salary details and payment status</p>
@@ -366,6 +410,7 @@ function Payroll() {
                 <tr>
                   <th>Employee</th>
                   <th>ID</th>
+                  <th>Email</th>
                   <th>Department</th>
                   <th>Basic Salary</th>
                   <th>Allowances</th>
@@ -381,24 +426,22 @@ function Payroll() {
                 {records.map((record) => (
                   <tr key={record.id}>
                     <td>{record.employeeName}</td>
+
                     <td>{record.employeeId}</td>
+
+                    <td>{record.employeeEmail || "No email"}</td>
+
                     <td>{record.department}</td>
 
-                    <td>
-                      ₹{Number(record.basicSalary || 0).toLocaleString("en-IN")}
-                    </td>
+                    <td>{formatSalary(record.basicSalary)}</td>
 
-                    <td>
-                      ₹{Number(record.allowances || 0).toLocaleString("en-IN")}
-                    </td>
+                    <td>{formatSalary(record.allowances)}</td>
 
-                    <td>
-                      ₹{Number(record.deductions || 0).toLocaleString("en-IN")}
-                    </td>
+                    <td>{formatSalary(record.deductions)}</td>
 
                     <td>
                       <strong>
-                        ₹{Number(record.netSalary || 0).toLocaleString("en-IN")}
+                        {formatSalary(record.netSalary)}
                       </strong>
                     </td>
 
@@ -421,7 +464,10 @@ function Payroll() {
                         <button
                           type="button"
                           className="edit-btn"
-                          disabled={updatingId !== null || deletingId !== null}
+                          disabled={
+                            updatingId !== null ||
+                            deletingId !== null
+                          }
                           onClick={() => void markAsPaid(record.id)}
                         >
                           {updatingId === record.id
@@ -437,7 +483,10 @@ function Payroll() {
                       <button
                         type="button"
                         className="delete-btn"
-                        disabled={deletingId !== null || updatingId !== null}
+                        disabled={
+                          deletingId !== null ||
+                          updatingId !== null
+                        }
                         onClick={() => void deletePayroll(record.id)}
                         style={{ marginLeft: "8px" }}
                       >
