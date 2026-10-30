@@ -1,6 +1,11 @@
+
 package employee_management.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "payroll")
@@ -11,23 +16,35 @@ public class Payroll {
     private Long id;
 
     private String employeeName;
+
     private String employeeId;
+
+    private String employeeEmail;
+
     private String department;
 
     private Double basicSalary;
+
     private Double allowances;
+
     private Double deductions;
+
     private Double netSalary;
 
     private String month;
+
     private String status;
 
+    // Default constructor
     public Payroll() {
     }
 
+    // Parameterized constructor
     public Payroll(
+            Long id,
             String employeeName,
             String employeeId,
+            String employeeEmail,
             String department,
             Double basicSalary,
             Double allowances,
@@ -36,8 +53,10 @@ public class Payroll {
             String month,
             String status) {
 
+        this.id = id;
         this.employeeName = employeeName;
         this.employeeId = employeeId;
+        this.employeeEmail = employeeEmail;
         this.department = department;
         this.basicSalary = basicSalary;
         this.allowances = allowances;
@@ -46,6 +65,8 @@ public class Payroll {
         this.month = month;
         this.status = status;
     }
+
+    // Getters and Setters
 
     public Long getId() {
         return id;
@@ -69,6 +90,14 @@ public class Payroll {
 
     public void setEmployeeId(String employeeId) {
         this.employeeId = employeeId;
+    }
+
+    public String getEmployeeEmail() {
+        return employeeEmail;
+    }
+
+    public void setEmployeeEmail(String employeeEmail) {
+        this.employeeEmail = employeeEmail;
     }
 
     public String getDepartment() {

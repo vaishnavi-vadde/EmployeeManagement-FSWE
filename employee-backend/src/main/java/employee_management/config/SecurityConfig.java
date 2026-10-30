@@ -22,6 +22,7 @@ public class SecurityConfig {
 
     public SecurityConfig(
             JwtAuthenticationFilter jwtAuthenticationFilter) {
+
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
@@ -30,16 +31,39 @@ public class SecurityConfig {
             HttpSecurity http) throws Exception {
 
         http
+            // Disable CSRF for REST APIs
             .csrf(csrf -> csrf.disable())
+
+            // Enable CORS
             .cors(Customizer.withDefaults())
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+            // Use stateless JWT authentication
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(
+                    SessionCreationPolicy.STATELESS
+                )
+            )
+
+            // Configure endpoint permissions
             .authorizeHttpRequests(auth -> auth
+
+                // Login and registration
                 .requestMatchers("/api/auth/**").permitAll()
-                .anyRequest().authenticated())
+
+                // Razorpay webhook
+                .requestMatchers(
+                    "/api/payroll/webhook"
+                ).permitAll()
+
+                // All remaining APIs require authentication
+                .anyRequest().authenticated()
+            )
+
+            // Add JWT filter
             .addFilterBefore(
                 jwtAuthenticationFilter,
-                UsernamePasswordAuthenticationFilter.class);
+                UsernamePasswordAuthenticationFilter.class
+            );
 
         return http.build();
     }
@@ -48,11 +72,13 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration configuration)
             throws Exception {
+
         return configuration.getAuthenticationManager();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
+
         return new BCryptPasswordEncoder();
     }
 }
