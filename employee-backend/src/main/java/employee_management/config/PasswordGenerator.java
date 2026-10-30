@@ -6,14 +6,13 @@ public class PasswordGenerator {
 
     public static void main(String[] args) {
 
-        BCryptPasswordEncoder encoder =
-                new BCryptPasswordEncoder();
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
         String password = "NewPassword123";
 
         String hashedPassword = encoder.encode(password);
 
-        System.out.println("Password: " + password);
-        System.out.println("BCrypt Hash: " + hashedPassword);
+        System.out.println("Generated BCrypt Hash:");
+        System.out.println(hashedPassword);
     }
 }

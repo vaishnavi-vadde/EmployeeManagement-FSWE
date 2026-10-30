@@ -37,7 +37,7 @@ public class SecurityConfig {
             // Use CORS configuration from CorsConfig.java
             .cors(Customizer.withDefaults())
 
-            // Use stateless JWT authentication
+            // Stateless JWT authentication
             .sessionManagement(session ->
                 session.sessionCreationPolicy(
                     SessionCreationPolicy.STATELESS
@@ -47,19 +47,22 @@ public class SecurityConfig {
             // Configure endpoint permissions
             .authorizeHttpRequests(auth -> auth
 
-                // Login and registration
+                // Public login and signup endpoints
                 .requestMatchers("/api/auth/**").permitAll()
 
-                // Razorpay webhook
+                // Allow error endpoint
+                .requestMatchers("/error").permitAll()
+
+                // Public Razorpay webhook
                 .requestMatchers(
                     "/api/payroll/webhook"
                 ).permitAll()
 
-                // All remaining APIs require authentication
+                // All other APIs require authentication
                 .anyRequest().authenticated()
             )
 
-            // Add JWT filter
+            // Add JWT filter before username/password authentication
             .addFilterBefore(
                 jwtAuthenticationFilter,
                 UsernamePasswordAuthenticationFilter.class
@@ -82,4 +85,3 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
-
