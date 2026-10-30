@@ -1,5 +1,6 @@
 
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState } from "react";
+import type { FormEvent } from "react";
 
 interface LeaveRequestData {
   id: number;
@@ -11,7 +12,7 @@ interface LeaveRequestData {
   status: string;
 }
 
-const API_URL = "http://localhost:8081/api/leaves";
+const API_URL = `${import.meta.env.VITE_API_URL}/api/leaves`;
 
 function LeaveRequest() {
   const [requests, setRequests] = useState<LeaveRequestData[]>([]);
@@ -23,12 +24,11 @@ function LeaveRequest() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  const role = (localStorage.getItem("role") || "").toLowerCase();
   const username = localStorage.getItem("username") || "";
   const department = localStorage.getItem("employeeDepartment") || "";
   const employeeId = localStorage.getItem("employeeId") || "";
 
-  const getHeaders = (json = false): HeadersInit => {
+  const getHeaders = useCallback((json = false): HeadersInit => {
     const token = localStorage.getItem("token");
 
     if (!token) {
@@ -39,7 +39,7 @@ function LeaveRequest() {
       Authorization: `Bearer ${token}`,
       ...(json ? { "Content-Type": "application/json" } : {}),
     };
-  };
+  }, []);
 
   // LOAD THE LOGGED-IN USER'S LEAVE REQUESTS
   const loadRequests = useCallback(async () => {
@@ -72,6 +72,7 @@ function LeaveRequest() {
       setRequests(myRequests);
     } catch (err) {
       console.error("Leave requests error:", err);
+
       setError(
         err instanceof Error
           ? err.message
@@ -80,7 +81,7 @@ function LeaveRequest() {
     } finally {
       setLoading(false);
     }
-  }, [username]);
+  }, [username, getHeaders]);
 
   useEffect(() => {
     void loadRequests();
@@ -144,6 +145,7 @@ function LeaveRequest() {
       await loadRequests();
     } catch (err) {
       console.error("Leave submission error:", err);
+
       setError(
         err instanceof Error
           ? err.message
@@ -160,6 +162,7 @@ function LeaveRequest() {
       <div className="section-card">
         <div className="section-title">
           <span>📝</span>
+
           <div>
             <h2>Apply for Leave</h2>
             <p>Submit your leave request to the company</p>
@@ -209,6 +212,7 @@ function LeaveRequest() {
           />
 
           <label htmlFor="leave-from-date">From Date</label>
+
           <input
             id="leave-from-date"
             type="date"
@@ -218,6 +222,7 @@ function LeaveRequest() {
           />
 
           <label htmlFor="leave-to-date">To Date</label>
+
           <input
             id="leave-to-date"
             type="date"
@@ -241,6 +246,7 @@ function LeaveRequest() {
       <div className="section-card">
         <div className="section-title">
           <span>📋</span>
+
           <div>
             <h2>My Leave Requests</h2>
             <p>Track the status of your leave applications</p>
@@ -273,6 +279,7 @@ function LeaveRequest() {
                     <td>{request.reason}</td>
                     <td>{request.fromDate}</td>
                     <td>{request.toDate}</td>
+
                     <td>
                       <span
                         className={`leave-status ${
