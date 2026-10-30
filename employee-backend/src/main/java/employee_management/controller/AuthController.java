@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,6 +42,8 @@ public class AuthController {
     public ResponseEntity<?> signup(
             @RequestBody SignupRequest request) {
 
+        System.out.println("SIGNUP REQUEST RECEIVED");
+
         if (request.email == null
                 || request.email.isBlank()
                 || request.password == null
@@ -54,6 +57,7 @@ public class AuthController {
         String email = request.email.trim().toLowerCase();
 
         if (userRepository.existsByEmail(email)) {
+
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(Map.of("message",
                             "Email is already registered"));
@@ -66,6 +70,8 @@ public class AuthController {
         );
 
         userRepository.save(user);
+
+        System.out.println("SIGNUP SUCCESSFUL: " + email);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Map.of(
@@ -80,10 +86,14 @@ public class AuthController {
     public ResponseEntity<?> login(
             @RequestBody LoginRequest request) {
 
+        System.out.println("LOGIN CONTROLLER REACHED");
+
         if (request.email == null
                 || request.email.isBlank()
                 || request.password == null
                 || request.password.isBlank()) {
+
+            System.out.println("LOGIN FAILED: Email or password missing");
 
             return ResponseEntity.badRequest().body(
                     Map.of("message",
@@ -92,49 +102,83 @@ public class AuthController {
 
         String email = request.email.trim().toLowerCase();
 
-        Authentication authentication =
-                authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(
-                                email,
-                                request.password
-                        )
-                );
+        System.out.println("LOGIN EMAIL: " + email);
 
-        User user = userRepository.findByEmail(
-                authentication.getName()
-        ).orElseThrow();
+        try {
 
-        String role = user.getRole()
-                .trim()
-                .toUpperCase();
+            // Authenticate email and password
+            Authentication authentication =
+                    authenticationManager.authenticate(
+                            new UsernamePasswordAuthenticationToken(
+                                    email,
+                                    request.password
+                            )
+                    );
 
-        if (!role.equals("HR")
-                && !role.equals("MANAGER")
-                && !role.equals("EMPLOYEE")) {
+            System.out.println("AUTHENTICATION SUCCESSFUL");
 
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message",
-                            "Invalid user role"));
+            // Find user from database
+            User user = userRepository.findByEmail(
+                    authentication.getName()
+            ).orElseThrow();
+
+            // Validate role
+            String role = user.getRole()
+                    .trim()
+                    .toUpperCase();
+
+            if (!role.equals("HR")
+                    && !role.equals("MANAGER")
+                    && !role.equals("EMPLOYEE")) {
+
+                System.out.println("LOGIN FAILED: Invalid role");
+
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of(
+                                "message",
+                                "Invalid user role"
+                        ));
+            }
+
+            // Generate JWT token
+            String token = jwtService.generateToken(
+                    authentication.getName()
+            );
+
+            System.out.println("LOGIN SUCCESSFUL: " + email);
+
+            return ResponseEntity.ok(
+                    Map.of(
+                            "token", token,
+                            "tokenType", "Bearer",
+                            "email", user.getEmail(),
+                            "role", role,
+                            "message", "Login successful"
+                    )
+            );
+
+        } catch (AuthenticationException ex) {
+
+            System.out.println(
+                    "LOGIN AUTHENTICATION FAILED: "
+                            + ex.getClass().getSimpleName()
+            );
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of(
+                            "message",
+                            "Invalid email or password"
+                    ));
         }
-
-        String token = jwtService.generateToken(
-                authentication.getName()
-        );
-
-        return ResponseEntity.ok(Map.of(
-                "token", token,
-                "tokenType", "Bearer",
-                "email", user.getEmail(),
-                "role", role,
-                "message", "Login successful"
-        ));
     }
 
+    // Signup request DTO
     public static class SignupRequest {
         public String email;
         public String password;
     }
 
+    // Login request DTO
     public static class LoginRequest {
         public String email;
         public String password;
