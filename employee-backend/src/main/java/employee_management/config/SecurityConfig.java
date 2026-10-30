@@ -34,7 +34,7 @@ public class SecurityConfig {
             // Disable CSRF for REST APIs
             .csrf(csrf -> csrf.disable())
 
-            // Enable CORS
+            // Use CORS configuration from CorsConfig.java
             .cors(Customizer.withDefaults())
 
             // Use stateless JWT authentication
@@ -82,3 +82,4 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
+

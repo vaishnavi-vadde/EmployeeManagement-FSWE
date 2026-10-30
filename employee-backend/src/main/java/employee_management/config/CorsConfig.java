@@ -18,6 +18,7 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOrigins(Arrays.asList(
+                "https://employee-management-fswe.vercel.app",
                 "http://localhost:5173",
                 "http://localhost:5174",
                 "http://127.0.0.1:5173",
@@ -34,7 +35,9 @@ public class CorsConfig {
         ));
 
         config.setAllowedHeaders(Arrays.asList("*"));
-        config.setAllowCredentials(false);
+
+        // Allow credentials such as cookies or authorization-related requests
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
